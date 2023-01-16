@@ -3,18 +3,14 @@ import Image from 'next/image'
 import { Inter } from '@next/font/google'
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 
-
+import { DataParent} from '@/models/landingType'
 import styles from '../styles/Home.module.css'
 import MainTable from '@/components/MainTable'
 
 const inter = Inter({ subsets: ['latin'] })
 
 
-type Data = {
-  data:Response
-};
 export default function Home({ data }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-
   return (
     <>
       <Head>
@@ -30,11 +26,11 @@ export default function Home({ data }: InferGetServerSidePropsType<typeof getSer
   )
 }
 
-export const getServerSideProps: GetServerSideProps<{ data: Data }> = async (
+export const getServerSideProps: GetServerSideProps<{ data: DataParent }> = async (
   context
 ) => {
-  const res = await fetch("http://localhost:5000/api/landingpage");
-  const data: Data = await res.json();
+  const res = await fetch("http://localhost:5000/api/getldp");
+  const data: DataParent = await res.json();
 
   return {
     props: {
