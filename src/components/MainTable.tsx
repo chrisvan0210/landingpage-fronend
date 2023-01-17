@@ -1,10 +1,11 @@
 import React, { useState,useEffect } from "react";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
-import { Space, Table, Tag } from "antd";
+import { useRouter } from 'next/router'
+import { Space, Table, Tag,Modal } from "antd";
 import type { ColumnsType, TableProps } from "antd/es/table";
 
 import { DataType, AdminTblItem, DataParent } from "../models/landingType";
-import SubTable from "./SubTable";
+import AddNewModal from "./AddNewModal"
 
 var baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/";
 
@@ -12,21 +13,22 @@ var baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/";
 function MainTable({data} : DataParent) {
   const [tableData,setTableData] = useState(data)
   const [isLoad,setIsLoad] = useState(false)
+  const [isOpen, setIsOpen] = useState(false);
+  const router = useRouter()
 
-  useEffect(() => {
-    const getTable = async() =>{
-      const res = await fetch("http://localhost:5000/api/getldp");
-      const data = await res.json();
-      setTableData(data.data);
-    }
-    getTable();
-    
-  },[isLoad])
+  const getTable = async() =>{
+    const res = await fetch("http://localhost:5000/api/getldp");
+    const data = await res.json();
+    setTableData(data);
+  }
   const handleEdit = async (id:number) =>{
-   
+      // let editLDP = tableData.filter(item=> item.id === id)[0];
+      router.push({
+        pathname:'/edit',
+        query : {id:id},
+      });
   }
   const handleDelete = async (id:number) =>{
-    console.log("handleDelete",JSON.stringify({id:id}));
     try{
       let response = await fetch(baseUrl + "api/deleteldp",{
         headers: { 'Content-Type': 'application/json' },
@@ -34,8 +36,9 @@ function MainTable({data} : DataParent) {
         // mode : "no-cors",
         body: JSON.stringify({id:id})
       })
-      .then((res) =>console.log("deleted",res))
-      .then(()=> setIsLoad(prev => !prev));
+      .then((res) =>{
+        getTable();
+      })
     }
     catch(err){
       console.log(err);
@@ -77,89 +80,11 @@ function MainTable({data} : DataParent) {
     },
   ];
 
-  const columns: ColumnsType<DataType> = [
-    {
-      title: "id",
-      dataIndex: "id",
-      key: "id",
-      sorter: (a: { id: number }, b: { id: number }) => a.id - b.id,
-    },
-    {
-      title: "title",
-      dataIndex: "title",
-      key: "title",
-    },
-    {
-      title: "url",
-      dataIndex: "url",
-      key: "url",
-    },
-    {
-      title: "keyword",
-      dataIndex: "keyword",
-      key: "keyword",
-    },
-    {
-      title: "analytics",
-      dataIndex: "analytics",
-      key: "analytics",
-    },
-    {
-      title: "affid",
-      dataIndex: "affid",
-      key: "affid",
-    },
-    {
-      title: "facebookcode",
-      dataIndex: "facebookcode",
-      key: "facebookcode",
-    },
-    {
-      title: "noscript",
-      dataIndex: "noscript",
-      key: "noscript",
-    },
-    {
-      title: "mainurl",
-      dataIndex: "mainurl",
-      key: "mainurl",
-    },
-    {
-      title: "redirect",
-      dataIndex: "redirect",
-      key: "redirect",
-    },
-    {
-      title: "h1",
-      dataIndex: "h1",
-      key: "h1",
-    },
-    {
-      title: "h2",
-      dataIndex: "h2",
-      key: "h2",
-    },
-    {
-      title: "button1",
-      dataIndex: "button1",
-      key: "button1",
-    },
-    {
-      title: "button2",
-      dataIndex: "button2",
-      key: "button2",
-    },
-    {
-      title: "button3",
-      dataIndex: "button3",
-      key: "button3",
-    },
-  ];
-  const dataWithKeys = tableData.map((item: any, index: number) => {
+  const dataWithKeys = tableData?.map((item: any, index: number) => {
     item.key = index;
     return item;
   });
-  const dataAdminTable = dataWithKeys.reduce((acc, item) => {
+  const dataAdminTable = dataWithKeys?.reduce((acc, item) => {
     let newItem = {} as AdminTblItem;
     newItem.id = item.id;
     newItem.title = item.title;
@@ -168,21 +93,29 @@ function MainTable({data} : DataParent) {
     acc.push(newItem);
     return acc;
   }, [] as Array<object>);
+
+  console.log("1",isOpen)
   return (
     <div style={{ width: "100%" }}>
-      <div>MainTable</div>
+      <div style={{display:"flex",justifyContent:"space-between"}}>
+        <div>MainTable</div>
+        <div>
+          <button onClick={()=>setIsOpen(true)}>Add New</button>
+        </div>
+      </div>
       <Table
         columns={columnsAdminTbl}
         dataSource={dataAdminTable}
         bordered
         pagination={{
-          total: data.length-1,
+          total: tableData.length-1,
           pageSize: 5,
         }}
         // expandable={{
         //   expandedRowRender: (record) => <p style={{ margin: 0 }}><SubTable record = {record}/></p>,
         // }}
       />
+      <AddNewModal isOpen={isOpen}/>
     </div>
   );
 }

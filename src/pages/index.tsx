@@ -3,14 +3,16 @@ import Image from 'next/image'
 import { Inter } from '@next/font/google'
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 
-import { DataParent} from '@/models/landingType'
+import { DataParent,DataType} from '@/models/landingType'
 import styles from '../styles/Home.module.css'
 import MainTable from '@/components/MainTable'
+import ErrorPage from './errorpage'
+// const inter = Inter({ subsets: ['latin'] })
 
-const inter = Inter({ subsets: ['latin'] })
-
-
-export default function Home({ data }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+const Home = ({data}: DataParent)  =>{
+  if (data == null) {
+    return <ErrorPage  />
+  }
   return (
     <>
       <Head>
@@ -20,22 +22,29 @@ export default function Home({ data }: InferGetServerSidePropsType<typeof getSer
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={styles.main}>
-        <MainTable data={data.data}/>
+        <MainTable data={data}/>
       </main>
     </>
   )
 }
 
-export const getServerSideProps: GetServerSideProps<{ data: DataParent }> = async (
+export default Home
+
+export const getServerSideProps: GetServerSideProps = async (
   context
 ) => {
-  const res = await fetch("http://localhost:5000/api/getldp");
-  const data: DataParent = await res.json();
-
-  return {
-    props: {
-      data,
-    },
-  };
+  try{
+    const res = await fetch("http://localhost:5000/api/getldp");
+    const data : Array<DataType> = await res.json();
+    return {
+      props: {
+        data:data,
+      },
+    };
+  }catch(error){
+    return { props: {
+      data : null
+    }};
+  }
 };
 
