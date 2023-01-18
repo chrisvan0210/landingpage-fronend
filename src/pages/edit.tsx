@@ -2,8 +2,8 @@ import React, { useEffect, useState, useRef} from "react";
 import { useRouter } from "next/router";
 import { DataType } from "../models/landingType";
 import { Button, Form, Input } from "antd";
-import { FormContainer } from "../styled-page/edit";
-import { Preahvihear } from "@next/font/google";
+import { DoubleLeftOutlined  } from '@ant-design/icons';
+import { FormContainer } from "../styled-page/global";
 
 var baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/";
 
@@ -53,7 +53,6 @@ function edit() {
   }
 
   const onFinish = async (values: DataType) => {
-    console.log(values);
     if (values.id) {
       try {
         await fetch("http://localhost:5000/api/updateldp-admin", {
@@ -72,13 +71,10 @@ function edit() {
       }
     }
   };
-  const handleAddNew = async () => {
-
-  }
   return (
     <FormContainer>
         <div className="edit_header">
-            <button onClick={()=>router.push("/")}>back</button>
+            <Button type="primary" onClick={()=>router.push("/")}><DoubleLeftOutlined />Back</Button>
         </div>
       <Form
         {...layout}

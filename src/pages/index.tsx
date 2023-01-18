@@ -1,18 +1,22 @@
 import Head from 'next/head'
-import Image from 'next/image'
-import { Inter } from '@next/font/google'
-import { GetServerSideProps, InferGetServerSidePropsType } from "next";
+import { GetServerSideProps } from "next";
+import { useEffect, useState, } from 'react';
+import { useRouter } from "next/router";
 
 import { DataParent,DataType} from '@/models/landingType'
 import styles from '../styles/Home.module.css'
 import MainTable from '@/components/MainTable'
 import ErrorPage from './errorpage'
-// const inter = Inter({ subsets: ['latin'] })
+
 
 const Home = ({data}: DataParent)  =>{
-  if (data == null) {
-    return <ErrorPage  />
-  }
+  const [user,setUser] = useState(false);
+  const router = useRouter();
+ 
+  useEffect(()=>{
+    if(!user) router.push("/login")
+  },[])
+ 
   return (
     <>
       <Head>
@@ -22,7 +26,7 @@ const Home = ({data}: DataParent)  =>{
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={styles.main}>
-        <MainTable data={data}/>
+        {user &&  <MainTable data={data}/>}
       </main>
     </>
   )
