@@ -4,7 +4,7 @@ import { DataType } from "../models/landingType";
 import { Button, Form, Input } from "antd";
 import { DoubleLeftOutlined  } from '@ant-design/icons';
 import { FormContainer } from "../styled-page/global";
-
+import withAuth from "../HOC/auth"
 var baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/";
 
 export type FieldData = DataType | undefined;
@@ -140,4 +140,4 @@ function edit() {
   );
 }
 
-export default edit;
+export default withAuth(edit);

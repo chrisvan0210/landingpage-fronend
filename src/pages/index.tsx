@@ -1,22 +1,30 @@
-import Head from 'next/head'
+// https://github.com/vercel/next.js/discussions/35773
+
+import Head from "next/head";
 import { GetServerSideProps } from "next";
-import { useEffect, useState, } from 'react';
-import { useRouter } from "next/router";
+import { Router, useRouter } from "next/router";
 
-import { DataParent,DataType} from '@/models/landingType'
-import styles from '../styles/Home.module.css'
-import MainTable from '@/components/MainTable'
-import ErrorPage from './errorpage'
+import { DataParent, DataType } from "@/models/landingType";
+import styles from "../styles/Home.module.css";
+import MainTable from "@/components/MainTable";
+import ErrorPage from "./errorpage";
+import withAuth from "../HOC/auth"
+import userHook from "hooks/userHook";
+import { Button } from "antd";
+import { HeaderWrapper } from "styled-page/global";
+import { setCookie, destroyCookie } from 'nookies';
 
-
-const Home = ({data}: DataParent)  =>{
-  const [user,setUser] = useState(false);
+const Home = ({ data }: DataParent) => {
+  const {user} = userHook()
   const router = useRouter();
- 
-  useEffect(()=>{
-    if(!user) router.push("/login")
-  },[])
- 
+
+  const handleLogout = () => {
+    console.log("logged out");
+    //  Destroy
+    destroyCookie(null, 'auth');
+    router.push("/login")
+  }
+
   return (
     <>
       <Head>
@@ -25,30 +33,35 @@ const Home = ({data}: DataParent)  =>{
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
+      <HeaderWrapper>
+        <div className="header-right">
+          {/* <Button type="primary" onClick={handleLogout}>Login</Button> */}
+          <Button type="primary" onClick={handleLogout}>Logout</Button>
+        </div>
+      </HeaderWrapper>
       <main className={styles.main}>
-        {user &&  <MainTable data={data}/>}
+      <MainTable data={data} />
       </main>
     </>
-  )
-}
-
-export default Home
-
-export const getServerSideProps: GetServerSideProps = async (
-  context
-) => {
-  try{
-    const res = await fetch("http://localhost:5000/api/getldp");
-    const data : Array<DataType> = await res.json();
-    return {
-      props: {
-        data:data,
-      },
-    };
-  }catch(error){
-    return { props: {
-      data : null
-    }};
-  }
+  );
 };
 
+export default withAuth(Home);
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  try {
+    const res = await fetch("http://localhost:5000/api/getldp");
+    const data: Array<DataType> = await res.json();
+    return {
+      props: {
+        data: data,
+      },
+    };
+  } catch (error) {
+    return {
+      props: {
+        data: null,
+      },
+    };
+  }
+};

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect,useContext } from "react";
 import { useRouter } from "next/router";
 import { Button, Table, Popconfirm } from "antd";
 import type { ColumnsType } from "antd/es/table";
@@ -12,6 +12,7 @@ var baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/";
 function MainTable({ data }: DataParent) {
   const [tableData, setTableData] = useState(data);
   const router = useRouter();
+
 
   const getTable = async () => {
     const res = await fetch("http://localhost:5000/api/getldp");

@@ -1,9 +1,8 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Modal, Form, Input, Button, message } from "antd";
 import { FormLogin } from "../styled-page/global";
-import {UserContext} from "../Provider/MyProvider"
 import { useRouter } from "next/router";
-
+import {setCookie} from 'nookies'
 interface AddedType {
     username:string;
     password:string;
@@ -13,41 +12,34 @@ interface AddedType {
 function login() {
   const [form] = Form.useForm();
   const router = useRouter();
-  const {user,setUser} = useContext(UserContext);
-  const [stateUSer,setStateUser] = useState(null)
   
 
-  useEffect(()=>{
-    console.log("user",user)
-    setStateUser(user)
-    if(stateUSer) router.push("/")
-  },[])
   const onFinish = async (values:AddedType) => {
     if (values) {
-      try {
-        await fetch("http://localhost:5000/api/login", {
-          headers: { "Content-Type": "application/json" },
-          method: "POST",
-          body: JSON.stringify(values),
-        })
-          .then((res) => res.json())
-          .then((data) => {
-            console.log(data.user)
-            setUser(data.user);
-            localStorage.setItem("user",JSON.stringify(data.user))
-          });
-      } catch (err) {
-        console.log(err);
-      }
+      const result = await fetch("/api/login",{
+        method: "POST",
+        body:JSON.stringify(values) 
+      })
+      let data = await result.json();
+      let expires = new Date();
+
+    
+      data.expires = expires.getTime();
+      console.log("result",data);
+      data = JSON.stringify(data);
+      setCookie(null, 'auth', data, {
+        maxAge: 60 * 60,
+        path: '/',
+      })
     }
     form.resetFields();
     message.info('Logged');
+    router.push("/")
   }
 
   
   return (
     <FormLogin>
-        {JSON.stringify(stateUSer,null,4)}
       <Form
         form={form}
         labelCol={{ span: 8 }}
