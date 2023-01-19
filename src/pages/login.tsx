@@ -28,7 +28,7 @@ function login() {
       console.log("result",data);
       data = JSON.stringify(data);
       setCookie(null, 'auth', data, {
-        maxAge: 60 * 60,
+        maxAge: 60 * 60 * 24,
         path: '/',
       })
     }

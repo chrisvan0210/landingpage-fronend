@@ -1,19 +1,21 @@
 import React, { useState, useEffect,useContext } from "react";
 import { useRouter } from "next/router";
-import { Button, Table, Popconfirm } from "antd";
+import { Button, Table, Popconfirm, Input } from "antd";
 import type { ColumnsType } from "antd/es/table";
 
 import { AdminTblItem, DataParent } from "../models/landingType";
 import AddNewModal from "./ModalAddLDP";
 import { TotalWrapper, ButtonWrapper } from "./styled";
+import userHook from "hooks/userHook";
 
 var baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/";
 
 function MainTable({ data }: DataParent) {
   const [tableData, setTableData] = useState(data);
+  const [search, setSearch] = useState('');
   const router = useRouter();
-
-
+  const {user} =userHook();
+  
   const getTable = async () => {
     const res = await fetch("http://localhost:5000/api/getldp");
     const data = await res.json();
@@ -21,12 +23,20 @@ function MainTable({ data }: DataParent) {
   };
   const handleEdit = async (id: number) => {
     // let editLDP = tableData.filter(item=> item.id === id)[0];
+    if(!user) {
+      alert("pls login first");
+      return;
+    }
     router.push({
       pathname: "/edit",
       query: { id: id },
     });
   };
   const handleDelete = async (id: number) => {
+    if(!user) {
+      alert("pls login first");
+      return;
+    }
     try {
       let response = await fetch(baseUrl + "api/deleteldp", {
         headers: { "Content-Type": "application/json" },
@@ -49,6 +59,21 @@ function MainTable({ data }: DataParent) {
       </TotalWrapper>
     );
   };
+  const FilterByNameInput = (
+    <Input
+      placeholder="Title"
+      value={search}
+      onChange={e => {
+        const currValue = e.target.value;
+        setSearch(currValue);
+        const filteredData = data.filter(entry =>
+          entry.title?.includes(currValue)
+        );
+        setTableData(filteredData);
+      }}
+    />
+  );
+
   const columnsAdminTbl: ColumnsType<AdminTblItem> = [
     {
       title: "id",
@@ -58,7 +83,7 @@ function MainTable({ data }: DataParent) {
       sorter: (a: { id: number }, b: { id: number }) => a.id - b.id,
     },
     {
-      title: "title",
+      title: FilterByNameInput,
       dataIndex: "title",
       width: "35%",
       key: "title",

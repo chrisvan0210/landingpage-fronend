@@ -8,23 +8,29 @@ import { DataParent, DataType } from "@/models/landingType";
 import styles from "../styles/Home.module.css";
 import MainTable from "@/components/MainTable";
 import ErrorPage from "./errorpage";
-import withAuth from "../HOC/auth"
+import withAuth from "../HOC/auth";
 import userHook from "hooks/userHook";
 import { Button } from "antd";
 import { HeaderWrapper } from "styled-page/global";
-import { setCookie, destroyCookie } from 'nookies';
+import { setCookie, destroyCookie } from "nookies";
+import Link from "next/link";
+import { useEffect, useState } from "react";
 
 const Home = ({ data }: DataParent) => {
-  const {user} = userHook()
+  const [auth, setAuth] = useState()
+  const { user } = userHook();
   const router = useRouter();
 
+  useEffect(() => {
+    setAuth(user)
+  }, [])
+  
   const handleLogout = () => {
     console.log("logged out");
     //  Destroy
-    destroyCookie(null, 'auth');
-    router.push("/login")
-  }
-
+    destroyCookie(null, "auth");
+    router.push("/login");
+  };
   return (
     <>
       <Head>
@@ -35,12 +41,22 @@ const Home = ({ data }: DataParent) => {
       </Head>
       <HeaderWrapper>
         <div className="header-right">
-          {/* <Button type="primary" onClick={handleLogout}>Login</Button> */}
-          <Button type="primary" onClick={handleLogout}>Logout</Button>
+          {auth ? (
+            <Button type="primary" onClick={handleLogout}>
+              Logout
+            </Button>
+          ) : (
+            <Button type="primary" onClick={handleLogout}>
+              <Link href={"/login"}>Login</Link>
+            </Button>
+          )}
         </div>
       </HeaderWrapper>
       <main className={styles.main}>
-      <MainTable data={data} />
+        {
+          auth && <MainTable data={data} />
+        }
+        
       </main>
     </>
   );

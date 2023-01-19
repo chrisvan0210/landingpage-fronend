@@ -2,7 +2,12 @@ import {parseCookies} from 'nookies'
 
 const userHook = () =>{
     const fromCookie =  parseCookies()
-        let user = fromCookie.auth;
+    let user
+    if(fromCookie && fromCookie.auth){
+        user = fromCookie.auth;
+        user = JSON.parse(user);
+    }
+        
     return {user}
 }
 
