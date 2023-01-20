@@ -15,15 +15,17 @@ function MainTable({ data }: DataParent) {
   const [tableData, setTableData] = useState(data);
   const [search, setSearch] = useState("");
   const [visible, setVisible] = useState(false);
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
   const { user } = userHook();
   const searchInput = useRef<InputRef>(null);
 
   const getTable = async () => {
+    setLoading(true);
     const res = await fetch("http://localhost:5000/api/getldp");
     const data = await res.json();
     setTableData(data);
+    setLoading(false);
   };
   const handleEdit = async (id: number) => {
     // let editLDP = tableData.filter(item=> item.id === id)[0];
@@ -65,11 +67,12 @@ function MainTable({ data }: DataParent) {
   };
 
   useEffect(() => {
+    
     searchInput.current?.focus();
     if(!data){
-      setLoading(true)
+      setLoading(true);
     }else{
-      setLoading(false)
+      setLoading(false);
     }
   }, [visible]);
 
@@ -80,7 +83,7 @@ function MainTable({ data }: DataParent) {
           placeholder="Title"
           value={search}
           ref={searchInput}
-          onBlur={()=>setVisible(prev=>!prev)}
+          onBlur={() => setVisible((prev) => !prev)}
           onChange={(e) => {
             const currValue = e.target.value;
             setSearch(currValue);
@@ -93,7 +96,7 @@ function MainTable({ data }: DataParent) {
       ) : (
         <>
           <div>Title</div>
-          <SearchOutlined onClick={()=>setVisible((prev) => !prev)} />
+          <SearchOutlined onClick={() => setVisible((prev) => !prev)} />
         </>
       )}
     </div>
@@ -105,7 +108,7 @@ function MainTable({ data }: DataParent) {
       dataIndex: "id",
       width: "12%",
       key: "id",
-      fixed: 'left',
+      fixed: "left",
       sorter: (a: { id: number }, b: { id: number }) => a.id - b.id,
     },
     {
@@ -172,18 +175,19 @@ function MainTable({ data }: DataParent) {
 
   return (
     <MainTableWrapper>
-      <div style={{ display: "flex", justifyContent: "space-between" }}>
+      <div className="table-header">
         <Button
           type="dashed"
           size="large"
           style={{ backgroundColor: "yellow", fontWeight: "bold" }}
+          className="table-title"
         >
           LANDING PAGES
         </Button>
         <AddNewModal getTable={getTable} />
       </div>
       <Table
-      scroll={{ x: 700 }}
+        scroll={{ x: 700 }}
         columns={columnsAdminTbl}
         dataSource={dataWithKeys}
         bordered

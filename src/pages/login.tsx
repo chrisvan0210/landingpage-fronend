@@ -31,8 +31,8 @@ function login() {
           maxAge: 60 * 60 * 10,
           path: '/',
         })
-        message.success('Welcome back Admin');
         router.push("/")
+        message.success('Welcome back Admin');
       }
       catch (err) {
         message.warning('Wrong username or password');

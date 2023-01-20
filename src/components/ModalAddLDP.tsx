@@ -46,7 +46,7 @@ const ModalAddLDP = (props:PropsType) =>{
 
   return (
     <div>
-      <Button type="primary" onClick={handletoggleModal}>Add New</Button>
+      <Button type="primary" size="large" onClick={handletoggleModal}>Add New</Button>
       <Modal title="Create new landing page" open={isModalOpen} footer={null} onCancel={handleCancel}>
         <Form form={form} labelCol={{ span: 8 }} wrapperCol={{ span: 24 }} onFinish={onFinish}>
           <Form.Item

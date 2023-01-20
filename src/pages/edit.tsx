@@ -83,9 +83,6 @@ function edit() {
   };
   return (
     <FormContainer>
-        <div className="edit_header">
-            <Button type="primary" onClick={()=>router.push("/")}><DoubleLeftOutlined />Home Page</Button>
-        </div>
       <Form
         {...layout}
         form={form}

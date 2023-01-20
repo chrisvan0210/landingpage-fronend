@@ -2,34 +2,21 @@
 
 import Head from "next/head";
 import { GetServerSideProps } from "next";
-import { Router, useRouter } from "next/router";
 
 import { DataParent, DataType } from "@/models/landingType";
 import styles from "../styles/Home.module.css";
 import MainTable from "@/components/MainTable";
-import ErrorPage from "./errorpage";
 import withAuth from "../HOC/auth";
 import userHook from "hooks/userHook";
-import { Button } from "antd";
-import { HeaderWrapper } from "styled-page/global";
-import { setCookie, destroyCookie } from "nookies";
-import Link from "next/link";
 import { useEffect, useState } from "react";
 
 const Home = ({ data }: DataParent) => {
   const [auth, setAuth] = useState()
   const { user } = userHook();
-  const router = useRouter();
 
   useEffect(() => {
     setAuth(user)
   }, [])
-  
-  const handleLogout = () => {
-    //  Destroy
-    destroyCookie(null, "auth");
-    router.push("/login");
-  };
   return (
     <>
       <Head>
@@ -38,19 +25,6 @@ const Home = ({ data }: DataParent) => {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <HeaderWrapper>
-        <div className="header-right">
-          {auth ? (
-            <Button type="primary" onClick={handleLogout}>
-              Logout
-            </Button>
-          ) : (
-            <Button type="primary" onClick={handleLogout}>
-              <Link href={"/login"}>Login</Link>
-            </Button>
-          )}
-        </div>
-      </HeaderWrapper>
       <main className={styles.main}>
         {
           auth && <MainTable data={data} />

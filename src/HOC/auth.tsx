@@ -2,8 +2,8 @@ import nookies, { parseCookies } from "nookies";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 
-const withAuth = (WrappedComponent) => {
-  return (props) => {
+const withAuth = (WrappedComponent: any) => {
+  return (props: any) => {
     const router = useRouter();
     const fromCookie = parseCookies();
     
