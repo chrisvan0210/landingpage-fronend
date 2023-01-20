@@ -10,31 +10,37 @@ interface AddedType {
   
 
 function login() {
+  const [loading, setLoading] = useState(false)
   const [form] = Form.useForm();
   const router = useRouter();
   
 
   const onFinish = async (values:AddedType) => {
+    setLoading(true)
     if (values) {
-      const result = await fetch("/api/login",{
-        method: "POST",
-        body:JSON.stringify(values) 
-      })
-      let data = await result.json();
-      let expires = new Date();
-
-    
-      data.expires = expires.getTime();
-      console.log("result",data);
-      data = JSON.stringify(data);
-      setCookie(null, 'auth', data, {
-        maxAge: 60 * 60 * 24,
-        path: '/',
-      })
+      try{
+        const result = await fetch("/api/login",{
+          method: "POST",
+          body:JSON.stringify(values) 
+        })
+        let data = await result?.json();
+        let expires = new Date();
+        data.expires = expires.getTime();
+        data = JSON.stringify(data);
+        setCookie(null, 'auth', data, {
+          maxAge: 60 * 60 * 10,
+          path: '/',
+        })
+        message.success('Welcome back Admin');
+        router.push("/")
+      }
+      catch (err) {
+        message.warning('Wrong username or password');
+      }
+      
     }
+    setLoading(false)
     form.resetFields();
-    message.info('Logged');
-    router.push("/")
   }
 
   
@@ -60,10 +66,10 @@ function login() {
           name="password"
           rules={[{ required: true, message: "Please input your domain url!" }]}
         >
-          <Input />
+          <Input type="password"/>
         </Form.Item>
         <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-          <Button type="primary" htmlType="submit">
+          <Button type="primary" htmlType="submit" loading={loading}>
             Login
           </Button>
         </Form.Item>

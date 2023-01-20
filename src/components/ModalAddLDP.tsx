@@ -12,6 +12,7 @@ interface AddedType {
 
 const ModalAddLDP = (props:PropsType) =>{
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loading, setLoading] = useState(false)
   const [form] = Form.useForm();
 
   const handleCancel = () => {
@@ -21,6 +22,7 @@ const ModalAddLDP = (props:PropsType) =>{
     setIsModalOpen(prev => !prev)
   }
   const onFinish = async (values:AddedType) => {
+    setLoading(true)
     if (values) {
       try {
         await fetch("http://localhost:5000/api/addldp", {
@@ -37,8 +39,9 @@ const ModalAddLDP = (props:PropsType) =>{
         console.log(err);
       }
     }
+    setLoading(false)
     form.resetFields();
-    message.info('Successfully added!');
+    message.success('Successfully added!');
   }
 
   return (
@@ -65,7 +68,7 @@ const ModalAddLDP = (props:PropsType) =>{
             <Input />
           </Form.Item>
           <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-            <Button type="primary" htmlType="submit">
+            <Button type="primary" htmlType="submit" loading={loading}>
               Submit
             </Button>
           </Form.Item>

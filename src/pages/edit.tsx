@@ -1,7 +1,7 @@
-import React, { useEffect, useState, useRef} from "react";
+import React, { useEffect, useState, useMemo} from "react";
 import { useRouter } from "next/router";
 import { DataType } from "../models/landingType";
-import { Button, Form, Input } from "antd";
+import { Button, Form, Input,message } from "antd";
 import { DoubleLeftOutlined  } from '@ant-design/icons';
 import { FormContainer } from "../styled-page/global";
 import withAuth from "../HOC/auth"
@@ -11,65 +11,75 @@ export type FieldData = DataType | undefined;
 
 function edit() {
   const [landing, setLanding] = useState<DataType>();
+  const [loading, setLoading] = useState(false)
   const router = useRouter();
+  const [form] = Form.useForm();
   const { id } = router.query;
   //   const [form] = Form.useForm();
 
   useEffect(() => {
-    const landingDetails = async () => {
-      try {
-        await fetch("http://localhost:5000/api/getldp?id=" + id, {
-          headers: { "Content-Type": "application/json" },
-          method: "GET",
-        })
-          .then((res) => res.json())
-          .then((data) => {
-            delete data.createdAt;
-            delete data.updatedAt;
-            setLanding(data);
-          });
-      } catch (err) {
-        console.log(err);
-      }
-    };
     landingDetails();
   }, [id]);
+
+  const landingDetails = async () => {
+   
+    try {
+      await fetch("http://localhost:5000/api/getldp?id=" + id, {
+        headers: { "Content-Type": "application/json" },
+        method: "GET",
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          delete data.createdAt;
+          delete data.updatedAt;
+          setLanding(data);
+        });
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   const layout = {
     labelCol: { span: 2 },
     wrapperCol: { span: 24 },
   };
-  let accArray: any = [];
-  if (landing) {
-    let arrayKeys = Object.keys(landing);
-    let arrayValues = Object.values(landing);
-    for (let i = 0; i < arrayKeys.length; i++) {
-      let accObject = {
-        name: [arrayKeys[i]],
-        value: arrayValues[i],
-      };
-      accArray.push(accObject);
-    }
-  }
+  
+  const makeInitValue = useMemo(
+    ()=>{
+      let initValue: any = [];
+      if (landing) {
+        let arrayKeys = Object.keys(landing);
+        let arrayValues = Object.values(landing);
+        for (let i = 0; i < arrayKeys.length; i++) {
+          let accObject = {
+            name: [arrayKeys[i]],
+            value: arrayValues[i],
+          };
+          initValue.push(accObject);
+        }
+      }
+      return initValue;
+    },[landing])
 
   const onFinish = async (values: DataType) => {
+    setLoading(true)
     if (values.id) {
       try {
-        await fetch("http://localhost:5000/api/updateldp-admin", {
+        const result = await fetch("http://localhost:5000/api/updateldp-admin", {
           headers: { "Content-Type": "application/json" },
           method: "POST",
           body: JSON.stringify(values),
-        })
-          .then((res) => res.json())
-          .then((data) => {
-            delete data.createdAt;
-            delete data.updatedAt;
-            setLanding(data);
-          });
+        });
+        let data = await result.json();
+        delete data.createdAt;
+        delete data.updatedAt;
+        setLanding(data);
+        message.success("Update Successfully!")
       } catch (err) {
         console.log(err);
       }
     }
+    setLoading(false)
   };
   return (
     <FormContainer>
@@ -78,9 +88,10 @@ function edit() {
         </div>
       <Form
         {...layout}
+        form={form}
         name="nest-messages"
         onFinish={onFinish}
-        fields={accArray}
+        fields={makeInitValue}
       >
         <Form.Item name="id" label="id" hidden={true}>
           <Input type="text" />
@@ -131,7 +142,7 @@ function edit() {
           <Input />
         </Form.Item>
         <Form.Item wrapperCol={{ ...layout.wrapperCol, offset: 12 }}>
-          <Button type="primary" htmlType="submit">
+          <Button type="primary" htmlType="submit" loading={loading}>
             Submit
           </Button>
         </Form.Item>

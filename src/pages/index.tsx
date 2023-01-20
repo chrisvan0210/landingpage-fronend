@@ -26,7 +26,6 @@ const Home = ({ data }: DataParent) => {
   }, [])
   
   const handleLogout = () => {
-    console.log("logged out");
     //  Destroy
     destroyCookie(null, "auth");
     router.push("/login");

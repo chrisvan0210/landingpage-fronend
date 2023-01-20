@@ -1,21 +1,25 @@
-import React, { useState, useEffect,useContext } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import { useRouter } from "next/router";
-import { Button, Table, Popconfirm, Input } from "antd";
+import { Button, Table, Popconfirm, Input, Space, InputRef } from "antd";
 import type { ColumnsType } from "antd/es/table";
 
 import { AdminTblItem, DataParent } from "../models/landingType";
 import AddNewModal from "./ModalAddLDP";
-import { TotalWrapper, ButtonWrapper } from "./styled";
+import { TotalWrapper, ButtonWrapper, MainTableWrapper } from "./styled";
 import userHook from "hooks/userHook";
+import { SearchOutlined } from "@ant-design/icons";
 
 var baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/";
 
 function MainTable({ data }: DataParent) {
   const [tableData, setTableData] = useState(data);
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState("");
+  const [visible, setVisible] = useState(false);
+  const [loading, setLoading] = useState(false)
   const router = useRouter();
-  const {user} =userHook();
-  
+  const { user } = userHook();
+  const searchInput = useRef<InputRef>(null);
+
   const getTable = async () => {
     const res = await fetch("http://localhost:5000/api/getldp");
     const data = await res.json();
@@ -23,7 +27,7 @@ function MainTable({ data }: DataParent) {
   };
   const handleEdit = async (id: number) => {
     // let editLDP = tableData.filter(item=> item.id === id)[0];
-    if(!user) {
+    if (!user) {
       alert("pls login first");
       return;
     }
@@ -33,7 +37,7 @@ function MainTable({ data }: DataParent) {
     });
   };
   const handleDelete = async (id: number) => {
-    if(!user) {
+    if (!user) {
       alert("pls login first");
       return;
     }
@@ -59,27 +63,49 @@ function MainTable({ data }: DataParent) {
       </TotalWrapper>
     );
   };
+
+  useEffect(() => {
+    searchInput.current?.focus();
+    if(!data){
+      setLoading(true)
+    }else{
+      setLoading(false)
+    }
+  }, [visible]);
+
   const FilterByNameInput = (
-    <Input
-      placeholder="Title"
-      value={search}
-      onChange={e => {
-        const currValue = e.target.value;
-        setSearch(currValue);
-        const filteredData = data.filter(entry =>
-          entry.title?.includes(currValue)
-        );
-        setTableData(filteredData);
-      }}
-    />
+    <div className="search-title">
+      {visible ? (
+        <Input
+          placeholder="Title"
+          value={search}
+          ref={searchInput}
+          onBlur={()=>setVisible(prev=>!prev)}
+          onChange={(e) => {
+            const currValue = e.target.value;
+            setSearch(currValue);
+            const filteredData = data.filter((entry) =>
+              entry.title?.includes(currValue)
+            );
+            setTableData(filteredData);
+          }}
+        />
+      ) : (
+        <>
+          <div>Title</div>
+          <SearchOutlined onClick={()=>setVisible((prev) => !prev)} />
+        </>
+      )}
+    </div>
   );
 
   const columnsAdminTbl: ColumnsType<AdminTblItem> = [
     {
-      title: "id",
+      title: "ID",
       dataIndex: "id",
-      width: "15%",
+      width: "12%",
       key: "id",
+      fixed: 'left',
       sorter: (a: { id: number }, b: { id: number }) => a.id - b.id,
     },
     {
@@ -89,7 +115,7 @@ function MainTable({ data }: DataParent) {
       key: "title",
     },
     {
-      title: "url",
+      title: "URL",
       dataIndex: "url",
       width: "35%",
       render: (_: any, record: AdminTblItem) => {
@@ -103,11 +129,15 @@ function MainTable({ data }: DataParent) {
     {
       title: totalRow(),
       dataIndex: "action",
-      width: "15%",
+      width: "130px",
       render: (_: any, record: AdminTblItem) => {
         return (
           <ButtonWrapper>
-            <Button type="primary" onClick={() => handleEdit(record.id)} size="small">
+            <Button
+              type="primary"
+              onClick={() => handleEdit(record.id)}
+              size="small"
+            >
               Edit
             </Button>
             <Popconfirm
@@ -141,21 +171,29 @@ function MainTable({ data }: DataParent) {
   // }, [] as Array<object>);
 
   return (
-    <div style={{ width: "100%" }}>
+    <MainTableWrapper>
       <div style={{ display: "flex", justifyContent: "space-between" }}>
-      <Button type="dashed" size='large' style={{backgroundColor:"yellow",fontWeight:"bold"}}>LANDING PAGES</Button>
+        <Button
+          type="dashed"
+          size="large"
+          style={{ backgroundColor: "yellow", fontWeight: "bold" }}
+        >
+          LANDING PAGES
+        </Button>
         <AddNewModal getTable={getTable} />
       </div>
       <Table
+      scroll={{ x: 700 }}
         columns={columnsAdminTbl}
         dataSource={dataWithKeys}
         bordered
+        loading={loading}
         pagination={{
           total: tableData?.length - 1,
           pageSize: 10,
         }}
       />
-    </div>
+    </MainTableWrapper>
   );
 }
 
