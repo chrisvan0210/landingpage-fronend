@@ -4,29 +4,30 @@ import { DataType } from "../models/landingType";
 import { Button, Form, Input, message } from "antd";
 import { DoubleLeftOutlined } from "@ant-design/icons";
 import { FormContainer } from "../styled-page/global";
-import withAuth from "../HOC/auth";
+import WithAuth from "../HOC/WithAuth";
 import { GetServerSideProps, GetStaticProps, GetStaticPaths } from "next";
 var baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/";
 
-export type FieldData = DataType | undefined;
+export type FieldData = DataType;
 
-function edit({ data }: DataType) {
+function Edit({ data }: { data: DataType }) {
   const [landing, setLanding] = useState<DataType>();
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const [form] = Form.useForm();
   const { id } = router.query;
   //   const [form] = Form.useForm();
-
   useEffect(() => {
     if (!data || data === null) {
-      landingDetails();
+      // landingDetails();
     } else if (data.createdAt && data.updatedAt) {
       delete data.createdAt;
       delete data.updatedAt;
       setLanding(data);
     }
   }, []);
+
+  console.log("awehfoawehi",data);
   const landingDetails = async () => {
     try {
       let res = await fetch("http://localhost:5000/api/getldp?id=" + id, {
@@ -154,16 +155,16 @@ function edit({ data }: DataType) {
   );
 }
 
-export default withAuth(edit);
+export default WithAuth(Edit);
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  let id = context.query.id
+  let id = context.query.id;
   try {
     const res = await fetch("http://localhost:5000/api/getldp?id=" + id, {
       headers: { "Content-Type": "application/json" },
       method: "GET",
-    })
-    const data: DataType = await res.json();
+    });
+    const data: DataType[] = await res.json();
     return {
       props: {
         data: data,
@@ -172,7 +173,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   } catch (error) {
     return {
       props: {
-        data: null,
+        data: [],
       },
     };
   }

@@ -14,9 +14,9 @@ function Header() {
 
   let isHome = router.pathname === "/" ? true : false;
 
-  useEffect(() => {
-    setAuth(user);
-  }, [router]);
+    useEffect(() => {
+        setAuth(user);
+    }, []);
 
   const handleLogout = () => {
     //  Destroy

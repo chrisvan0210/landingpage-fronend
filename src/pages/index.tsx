@@ -6,7 +6,7 @@ import { GetServerSideProps } from "next";
 import { DataParent, DataType } from "@/models/landingType";
 import styles from "../styles/Home.module.css";
 import MainTable from "@/components/MainTable";
-import withAuth from "../HOC/auth";
+import WithAuth from "../HOC/WithAuth";
 import userHook from "hooks/userHook";
 import { useEffect, useState } from "react";
 
@@ -34,7 +34,7 @@ const Home = () => {
   );
 };
 
-export default withAuth(Home);
+export default WithAuth(Home);
 
 // export const getServerSideProps: GetServerSideProps = async (context) => {
 //   try {

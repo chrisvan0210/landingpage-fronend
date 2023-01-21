@@ -124,7 +124,7 @@ function MainTable() {
       width: "35%",
       render: (_: any, record: AdminTblItem) => {
         return (
-          <a href={record.url} target="_blank">
+          <a href={record.url} target="_blank" rel="noreferrer">
             {record.url}
           </a>
         );

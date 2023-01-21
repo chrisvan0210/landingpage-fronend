@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Modal, Form, Input, Button, message } from "antd";
 import { FormLogin, LoginPage } from "../styled-page/global";
 import { useRouter } from "next/router";
@@ -9,7 +9,7 @@ interface AddedType {
   password: string;
 }
 
-function login() {
+function Login() {
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
   const router = useRouter();
@@ -33,7 +33,6 @@ function login() {
         });
         
         let data = await result.json();
-        console.log(data)
         if (!data || data.error) {
           message.warning("Wrong username or password");
           setLoading(false);
@@ -95,4 +94,4 @@ function login() {
   );
 }
 
-export default login;
+export default Login;
