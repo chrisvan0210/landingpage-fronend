@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useContext, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/router";
-import { Button, Table, Popconfirm, Input, Space, InputRef } from "antd";
+import { Button, Table, Popconfirm, Input, InputRef } from "antd";
 import type { ColumnsType } from "antd/es/table";
 
-import { AdminTblItem, DataParent } from "../models/landingType";
+import { AdminTblItem, DataType } from "../models/landingType";
 import AddNewModal from "./ModalAddLDP";
 import { TotalWrapper, ButtonWrapper, MainTableWrapper } from "./styled";
 import userHook from "hooks/userHook";
@@ -11,8 +11,9 @@ import { SearchOutlined } from "@ant-design/icons";
 
 var baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/";
 
-function MainTable({ data }: DataParent) {
-  const [tableData, setTableData] = useState(data);
+function MainTable() {
+  const [listLDP, setListLDP] = useState<Array<DataType>>([]);
+  const [tableData, setTableData] = useState<Array<DataType>>([]);
   const [search, setSearch] = useState("");
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -25,8 +26,21 @@ function MainTable({ data }: DataParent) {
     const res = await fetch("http://localhost:5000/api/getldp");
     const data = await res.json();
     setTableData(data);
+    setListLDP(data);
     setLoading(false);
   };
+
+
+
+  useEffect(() => {
+    getTable();
+  }, []);
+
+  useEffect(() => {
+    searchInput.current?.focus();
+  }, [visible]);
+
+
   const handleEdit = async (id: number) => {
     // let editLDP = tableData.filter(item=> item.id === id)[0];
     if (!user) {
@@ -39,10 +53,6 @@ function MainTable({ data }: DataParent) {
     });
   };
   const handleDelete = async (id: number) => {
-    if (!user) {
-      alert("pls login first");
-      return;
-    }
     try {
       let response = await fetch(baseUrl + "api/deleteldp", {
         headers: { "Content-Type": "application/json" },
@@ -66,15 +76,6 @@ function MainTable({ data }: DataParent) {
     );
   };
 
-  useEffect(() => {
-    
-    searchInput.current?.focus();
-    if(!data){
-      setLoading(true);
-    }else{
-      setLoading(false);
-    }
-  }, [visible]);
 
   const FilterByNameInput = (
     <div className="search-title">
@@ -87,7 +88,7 @@ function MainTable({ data }: DataParent) {
           onChange={(e) => {
             const currValue = e.target.value;
             setSearch(currValue);
-            const filteredData = data.filter((entry) =>
+            const filteredData = listLDP.filter((entry) =>
               entry.title?.includes(currValue)
             );
             setTableData(filteredData);

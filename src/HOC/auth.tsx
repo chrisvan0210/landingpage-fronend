@@ -9,7 +9,7 @@ const withAuth = (WrappedComponent: any) => {
     
 
     if (typeof window !== "undefined") {
-      if (!fromCookie || !fromCookie.auth) {
+      if (!fromCookie || !fromCookie.authLDP) {
         router.push("/login");
       }
       // else if (fromCookie.auth){

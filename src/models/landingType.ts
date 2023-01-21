@@ -19,7 +19,8 @@ export interface DataType {
     button1: string;
     button2: string;
     button3: string;
-    createdAt: string;
+    createdAt?: string;
+    updatedAt?: string;
 }
 
 export interface AdminTblItem {

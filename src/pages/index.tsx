@@ -10,7 +10,7 @@ import withAuth from "../HOC/auth";
 import userHook from "hooks/userHook";
 import { useEffect, useState } from "react";
 
-const Home = ({ data }: DataParent) => {
+const Home = () => {
   const [auth, setAuth] = useState()
   const { user } = userHook();
 
@@ -27,9 +27,8 @@ const Home = ({ data }: DataParent) => {
       </Head>
       <main className={styles.main}>
         {
-          auth && <MainTable data={data} />
+          auth && <MainTable/>
         }
-        
       </main>
     </>
   );
@@ -37,20 +36,20 @@ const Home = ({ data }: DataParent) => {
 
 export default withAuth(Home);
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  try {
-    const res = await fetch("http://localhost:5000/api/getldp");
-    const data: Array<DataType> = await res.json();
-    return {
-      props: {
-        data: data,
-      },
-    };
-  } catch (error) {
-    return {
-      props: {
-        data: null,
-      },
-    };
-  }
-};
+// export const getServerSideProps: GetServerSideProps = async (context) => {
+//   try {
+//     const res = await fetch("http://localhost:5000/api/getldp");
+//     const data: Array<DataType> = await res.json();
+//     return {
+//       props: {
+//         data: data,
+//       },
+//     };
+//   } catch (error) {
+//     return {
+//       props: {
+//         data: null,
+//       },
+//     };
+//   }
+// };

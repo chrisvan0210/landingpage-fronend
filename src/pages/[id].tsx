@@ -156,24 +156,69 @@ function edit({ data }: DataType) {
 
 export default withAuth(edit);
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  let id = context.query.id
-  try {
-    const res = await fetch("http://localhost:5000/api/getldp?id=" + id, {
-      headers: { "Content-Type": "application/json" },
-      method: "GET",
-    })
-    const data: DataType = await res.json();
+// export const getServerSideProps: GetServerSideProps = async (context) => {
+//   let id = context.query.id
+//   try {
+//     const res = await fetch("http://localhost:5000/api/getldp?id=" + id, {
+//       headers: { "Content-Type": "application/json" },
+//       method: "GET",
+//     })
+//     const data: DataType = await res.json();
+//     return {
+//       props: {
+//         data: data,
+//       },
+//     };
+//   } catch (error) {
+//     return {
+//       props: {
+//         data: null,
+//       },
+//     };
+//   }
+// };
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  // Call an external API endpoint to get posts
+  const res = await fetch("http://localhost:5000/api/getldp", {
+    headers: { "Content-Type": "application/json" },
+    method: "GET",
+  });
+  const data = await res.json();
+  
+  // Get the paths we want to pre-render based on posts
+  const paths = data.map((post) => ({
+    params: { id: post.id },
+  }))
+  console.log(paths);
+  // We'll pre-render only these paths at build time.
+  // { fallback: false } means other routes should 404.
+  return {
+    paths: [{params: { id: "43" }}],
+    fallback: false,
+  };
+};
+
+export const getStaticProps: GetStaticProps = async (context) => {
+  let id = context.params?.id;
+  console.log("id", id);
+  const res = await fetch("http://localhost:5000/api/getldp?id="+id, {
+    headers: { "Content-Type": "application/json" },
+    method: "GET",
+  });
+  const data: DataType = await res.json();
+
+  if (!data || data === null) {
     return {
-      props: {
-        data: data,
-      },
-    };
-  } catch (error) {
-    return {
-      props: {
-        data: null,
+      redirect: {
+        destination: "/",
+        permanent: false,
+        // statusCode: 301
       },
     };
   }
+
+  return {
+    props: { data }, // will be passed to the page component as props
+  };
 };
