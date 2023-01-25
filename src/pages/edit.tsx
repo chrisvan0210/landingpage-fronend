@@ -19,30 +19,13 @@ function Edit({ data }: { data: DataType }) {
   //   const [form] = Form.useForm();
   useEffect(() => {
     if (!data || data === null) {
-      // landingDetails();
+      return;
     } else if (data.createdAt && data.updatedAt) {
       delete data.createdAt;
       delete data.updatedAt;
       setLanding(data);
     }
   }, []);
-
-  console.log("awehfoawehi",data);
-  const landingDetails = async () => {
-    try {
-      let res = await fetch("http://localhost:5000/api/getldp?id=" + id, {
-        headers: { "Content-Type": "application/json" },
-        method: "GET",
-      });
-      let data = await res.json();
-      delete data.createdAt;
-      delete data.updatedAt;
-
-      setLanding(data);
-    } catch (err) {
-      console.log(err);
-    }
-  };
 
   const layout = {
     labelCol: { span: 2 },

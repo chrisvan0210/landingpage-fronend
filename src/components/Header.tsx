@@ -8,9 +8,10 @@ import userHook from "hooks/userHook";
 import { DoubleLeftOutlined } from "@ant-design/icons";
 
 function Header() {
-  const [auth, setAuth] = useState(null);
-  const router = useRouter();
   const { user } = userHook();
+  const [auth, setAuth] = useState();
+  const router = useRouter();
+ 
 
   let isHome = router.pathname === "/" ? true : false;
 

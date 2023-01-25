@@ -27,7 +27,7 @@ const Home = () => {
       </Head>
       <main className={styles.main}>
         {
-          auth && <MainTable/>
+          user && <MainTable/>
         }
       </main>
     </>

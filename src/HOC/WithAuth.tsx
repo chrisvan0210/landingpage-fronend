@@ -3,9 +3,9 @@ import { useRouter } from "next/router";
 import { useEffect } from "react";
 
 const WithAuth = (WrappedComponent: any) => {
-  const router = useRouter();
-  const fromCookie = parseCookies();
-  const MyComp = (props:any) => {
+  const MyComp = (props: any) => {
+    const router = useRouter();
+    const fromCookie = parseCookies();
     if (typeof window !== "undefined") {
       if (!fromCookie || !fromCookie.authLDP) {
         router.push("/login");
@@ -14,8 +14,9 @@ const WithAuth = (WrappedComponent: any) => {
       console.log("we are running on the server");
     }
     return <WrappedComponent {...props} />;
-  }
-  MyComp.displayName = 'WithAuth';
+  };
+  MyComp.displayName = "WithAuth";
+  return MyComp;
 };
 
 export default WithAuth;
